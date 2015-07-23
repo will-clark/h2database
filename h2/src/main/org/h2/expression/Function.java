@@ -101,7 +101,7 @@ public class Function extends Expression implements FunctionCall {
             SECOND = 114, WEEK = 115, YEAR = 116, CURRENT_DATE = 117,
             CURRENT_TIME = 118, CURRENT_TIMESTAMP = 119, EXTRACT = 120,
             FORMATDATETIME = 121, PARSEDATETIME = 122, ISO_YEAR = 123,
-            ISO_WEEK = 124, ISO_DAY_OF_WEEK = 125;
+            ISO_WEEK = 124, ISO_DAY_OF_WEEK = 125, TO_DATE = 126;
 
     public static final int DATABASE = 150, USER = 151, CURRENT_USER = 152,
             IDENTITY = 153, SCOPE_IDENTITY = 154, AUTOCOMMIT = 155,
@@ -363,6 +363,8 @@ public class Function extends Expression implements FunctionCall {
         addFunctionWithNull("FORMATDATETIME", FORMATDATETIME,
                 VAR_ARGS, Value.STRING);
         addFunctionWithNull("PARSEDATETIME", PARSEDATETIME,
+                VAR_ARGS, Value.TIMESTAMP);
+        addFunctionWithNull("TO_DATE", TO_DATE,
                 VAR_ARGS, Value.TIMESTAMP);
         addFunction("ISO_YEAR", ISO_YEAR,
                 1, Value.INT);
@@ -1220,28 +1222,133 @@ public class Function extends Expression implements FunctionCall {
                 java.sql.Timestamp d = v0.getTimestamp();
                 Calendar c = Calendar.getInstance();
                 c.setTime(d);
-                c.set(Calendar.HOUR_OF_DAY, 0);
-                c.set(Calendar.MINUTE, 0);
-                c.set(Calendar.SECOND, 0);
-                c.set(Calendar.MILLISECOND, 0);
+                if (v1 != null) {
+                    String format = v1.getString().toUpperCase();
+                    if (";YY;YYYY;YEAR;".contains(format)) {
+                        c.set(Calendar.DAY_OF_YEAR, 1);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";MM;MON;MONTH;".contains(format)) {
+                        c.set(Calendar.DAY_OF_MONTH, 1);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";DD;DDD;J;DAY;".contains(format)) {
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";HH;HH24;HOUR;".contains(format)) {
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";MI;MINUTE;".contains(format)) {
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                }
+                else {
+                    // round to midnight
+                    c.set(Calendar.HOUR_OF_DAY, 0);
+                    c.set(Calendar.MINUTE, 0);
+                    c.set(Calendar.SECOND, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+                }
                 result = ValueTimestamp.fromMillis(c.getTimeInMillis());
             } else if (v0.getType() == Value.DATE) {
                 ValueDate vd = (ValueDate) v0;
                 Calendar c = Calendar.getInstance();
                 c.setTime(vd.getDate());
-                c.set(Calendar.HOUR_OF_DAY, 0);
-                c.set(Calendar.MINUTE, 0);
-                c.set(Calendar.SECOND, 0);
-                c.set(Calendar.MILLISECOND, 0);
+                if (v1 != null) {
+                    String format = v1.getString().toUpperCase();
+                    if (";YY;YYYY;YEAR;".contains(format)) {
+                        c.set(Calendar.DAY_OF_YEAR, 1);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";MM;MON;MONTH;".contains(format)) {
+                        c.set(Calendar.DAY_OF_MONTH, 1);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";DD;DDD;J;DAY;".contains(format)) {
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";HH;HH24;HOUR;".contains(format)) {
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";MI;MINUTE;".contains(format)) {
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                }
+                else {
+                    // round to midnight
+                    c.set(Calendar.HOUR_OF_DAY, 0);
+                    c.set(Calendar.MINUTE, 0);
+                    c.set(Calendar.SECOND, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+                }
                 result = ValueTimestamp.fromMillis(c.getTimeInMillis());
             } else if (v0.getType() == Value.STRING) {
                 ValueString vd = (ValueString) v0;
                 Calendar c = Calendar.getInstance();
                 c.setTime(ValueTimestamp.parse(vd.getString()).getDate());
-                c.set(Calendar.HOUR_OF_DAY, 0);
-                c.set(Calendar.MINUTE, 0);
-                c.set(Calendar.SECOND, 0);
-                c.set(Calendar.MILLISECOND, 0);
+                if (v1 != null) {
+                    String format = v1.getString().toUpperCase();
+                    if (";YY;YYYY;YEAR;".contains(format)) {
+                        c.set(Calendar.DAY_OF_YEAR, 1);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";MM;MON;MONTH;".contains(format)) {
+                        c.set(Calendar.DAY_OF_MONTH, 1);
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";DD;DDD;J;DAY;".contains(format)) {
+                        c.set(Calendar.HOUR_OF_DAY, 0);
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";HH;HH24;HOUR;".contains(format)) {
+                        c.set(Calendar.MINUTE, 0);
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                    else if (";MI;MINUTE;".contains(format)) {
+                        c.set(Calendar.SECOND, 0);
+                        c.set(Calendar.MILLISECOND, 0);
+                    }
+                }
+                else {
+                    // round to midnight
+                    c.set(Calendar.HOUR_OF_DAY, 0);
+                    c.set(Calendar.MINUTE, 0);
+                    c.set(Calendar.SECOND, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+                }
                 result = ValueTimestamp.fromMillis(c.getTimeInMillis());
             } else {
                 double d = v0.getDouble();
@@ -1476,6 +1583,43 @@ public class Function extends Expression implements FunctionCall {
                         null : v3 == ValueNull.INSTANCE ? null : v3.getString();
                 java.util.Date d = DateTimeUtils.parseDateTime(
                         v0.getString(), v1.getString(), locale, tz);
+                result = ValueTimestamp.fromMillis(d.getTime());
+            }
+            break;
+        }
+        case TO_DATE: {
+            if (v0 == ValueNull.INSTANCE || v1 == ValueNull.INSTANCE) {
+                result = ValueNull.INSTANCE;
+            } else {
+                String locale = v2 == null ?
+                        null : v2 == ValueNull.INSTANCE ? null : v2.getString();
+                String tz = v3 == null ?
+                        null : v3 == ValueNull.INSTANCE ? null : v3.getString();
+                String dateFormat = v1.getString();
+                if (dateFormat.contains("MON")) {
+                        dateFormat = dateFormat.replace("MON", "MMM");
+                }
+                if (dateFormat.contains("Y")) {
+                        dateFormat = dateFormat.replaceAll("Y", "y");
+                }
+                if (dateFormat.contains("D")) {
+                        dateFormat = dateFormat.replaceAll("D", "d");
+                }
+                if (dateFormat.contains("HH")) {
+                        dateFormat = dateFormat.replaceAll("HH", "hh");
+                }
+                if (dateFormat.contains("hh24")) {
+                        dateFormat = dateFormat.replaceAll("hh24", "hh");
+                }
+                if (dateFormat.contains("MI") || dateFormat.contains("mi")) {
+                        dateFormat = dateFormat.replaceAll("MI", "mi")
+                                    .replaceAll("mi", "mm");
+                }
+                if (dateFormat.contains("SS")) {
+                        dateFormat = dateFormat.replaceAll("SS", "ss");
+                }
+                java.util.Date d = DateTimeUtils.parseDateTime(
+                        v0.getString(), dateFormat, locale, tz);
                 result = ValueTimestamp.fromMillis(d.getTime());
             }
             break;
@@ -2133,6 +2277,7 @@ public class Function extends Expression implements FunctionCall {
             break;
         case FORMATDATETIME:
         case PARSEDATETIME:
+        case TO_DATE:
             min = 2;
             max = 4;
             break;
@@ -2316,7 +2461,7 @@ public class Function extends Expression implements FunctionCall {
                 d = ValueInt.DISPLAY_SIZE;
                 s = 0;
             } else if (t == Value.TIMESTAMP) {
-                t = Value.DATE;
+                t = Value.TIMESTAMP;
                 p = ValueDate.PRECISION;
                 s = 0;
                 d = ValueDate.DISPLAY_SIZE;

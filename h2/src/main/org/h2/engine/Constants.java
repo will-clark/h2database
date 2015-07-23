@@ -16,7 +16,7 @@ public class Constants {
     /**
      * The build date is updated for each public release.
      */
-    public static final String BUILD_DATE = "2015-04-10";
+    public static final String BUILD_DATE = "2015-07-23";
 
     /**
      * The build date of the last stable release.
@@ -44,7 +44,7 @@ public class Constants {
      * Additionally, a version number should be set to distinguish releases.
      * Example: ACME_SVN1651_BUILD3
      */
-    public static final String BUILD_VENDOR_AND_VERSION = null;
+    public static final String BUILD_VENDOR_AND_VERSION = "CUSTOM_PATIENTKEEPER_BUILD1";
 
     /**
      * The TCP protocol version number 6.
